@@ -1,0 +1,114 @@
+apiVersion: redskyops.dev/v1alpha1
+kind: Experiment
+metadata:
+  name: nuodb-example-29
+spec:
+  optimization:
+  - name: "experimentBudget"
+    value: "200"
+  - name: "burnIn"
+    value: "10"
+  parameters:
+  - name: persistence_size
+    min: 5
+    max: 30
+  - name: sm_memory
+    min: 8
+    max: 16
+  - name: sm_cpu
+    min: 4
+    max: 8
+  - name: sm_replicas
+    min: 1
+    max: 3
+  - name: te_memory
+    min: 8
+    max: 16
+  - name: te_cpu
+    min: 2
+    max: 4
+  - name: te_replicas
+    min: 1
+    max: 3
+  metrics:
+  - name: duration
+    minimize: true
+    query: "{{duration .StartTime .CompletionTime}}"
+  - name: cost
+    minimize: true
+    type: pods
+    # Note that these cost weights are specific to GKE and represent $22/month/cpu and $3/month/GB
+    query: '{{resourceRequests .Pods "cpu=0.022,memory=0.000000000003"}}'
+    selector:
+      matchExpressions:
+        - key: component
+          operator: In
+          values:
+          - sm
+          - te
+  patches:
+  - targetRef:
+      kind: StatefulSet
+      apiVersion: apps/v1
+      name: sm-database-nuodb-cluster0-demo
+    patch: &patch |
+      spec:
+        replicas: "{{ .Values.sm_replicas }}"
+        template:
+          spec:
+            containers:
+            - name: engine
+              resources:
+                database:
+                  sm:
+                    resources:
+                      limits:
+                        cpu: "{{ .Values.sm_cpu }}"
+                        memory: "{{ .Values.sm_memory }}Mi"
+                      requests:
+                        cpu: "{{ .Values.sm_cpu }}"
+                        memory: "{{ .Values.sm_memory }}Mi"
+  - targetRef:
+      kind: StatefulSet
+      apiVersion: apps/v1
+      name: sm-database-nuodb-cluster0-demo-hotcopy
+    patch: *patch
+  - targetRef:
+      kind: Deployment
+      apiVersion: apps/v1
+      name: te-database-nuodb-cluster0-demo
+    patch: |
+      spec:
+        replicas: "{{ .Values.te_replicas }}"
+        template:
+          spec:
+            containers:
+            - name: engine
+              resources:
+                database:
+                  te:
+                    resources:
+                      limits:
+                        cpu: "{{ .Values.te_cpu }}"
+                        memory: "{{ .Values.te_memory }}Mi"
+                      requests:
+                        cpu: "{{ .Values.te_cpu }}"
+                        memory: "{{ .Values.te_memory }}Mi"
+  template: # trial
+    spec:
+      setupTasks:
+      - name: demo-ycsb
+        helmChart: demo-ycsb
+        helmChartVersion: 3.0.0
+        helmRepository: https://storage.cloud.google.com/nuodb-charts-incubator/
+        helmValues:
+        - name: cloud.provider
+          value: google
+        - name: cloud.zones
+          value: us-central1-a
+        - name: replicas
+          value: 1
+        - name: workload
+          value: b
+        - name: maxDelay
+          value: 240000
