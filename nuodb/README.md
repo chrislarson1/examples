@@ -26,15 +26,14 @@ The NuoDB stack has four charts that need to be installed into your cluster. You
 [instructons](https://github.com/nuodb/nuodb-helm-charts/blob/master/stable/README.md), or simply run the following
   commands to install the core NuoDB components into your cluster:
   
-  1. `$ helm install transparent-hugepage nuodb/transparent-hugepage --set cloud.provider=<your-cloud-provider> --set
-   cloud.zones=<your-cloud-zone>`
+  1. `$ helm install transparent-hugepage nuodb/transparent-hugepage --set cloud.provider=<your-cloud-provider> --set cloud.zones=<your-cloud-zone>`
   2. `$ helm install admin nuodb/admin --set cloud.provider=<your-cloud-provider> --set cloud.zones=<your-cloud-zone>`
   3. `$ helm install storage-class nuodb/storage-class --set cloud.provider=<your-cloud-provider> --set cloud.zones=<your-cloud-zone>`
   4. `$ helm install database nuodb/database --set cloud.provider=<your-cloud-provider> --set cloud.zones=<your-cloud-zone>`
 
 ## Resource Tuning
 
-Our goal is to configure our NuoDB stack to achieve the optimal combination of cost and performance. In this
+Our goal is to configure our NuoDB resources to achieve the optimal combination of cost and performance. In this
  experiment we will measure performance using the `duration` template function, which computes the difference between
   the `.CompletionTime` and `.StartTime` of the Trial job. For our cost metric, we define a template function that
    maps resource usage of the NuoDB database pods to a monthly US dollar amount. Documentation on StormForge Optimize
