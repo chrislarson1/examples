@@ -1,7 +1,7 @@
 apiVersion: redskyops.dev/v1alpha1
 kind: Experiment
 metadata:
-  name: nuodb-example-29
+  name: nuodb-example-30
 spec:
   optimization:
   - name: "experimentBudget"
@@ -51,7 +51,7 @@ spec:
       kind: StatefulSet
       apiVersion: apps/v1
       name: sm-database-nuodb-cluster0-demo
-    patch: &patch |
+    patch: |
       spec:
         replicas: "{{ .Values.sm_replicas }}"
         template:
@@ -60,6 +60,8 @@ spec:
             - name: engine
               resources:
                 database:
+                  persistence:
+                    size: "{{ .Values.persistence_size }}Gi"
                   sm:
                     resources:
                       limits:
@@ -72,7 +74,25 @@ spec:
       kind: StatefulSet
       apiVersion: apps/v1
       name: sm-database-nuodb-cluster0-demo-hotcopy
-    patch: *patch
+    patch: |
+      spec:
+        replicas: "{{ .Values.sm_replicas }}"
+        template:
+          spec:
+            containers:
+            - name: engine
+              resources:
+                database:
+                  persistence:
+                    size: "{{ .Values.persistence_size }}Gi"
+                  sm:
+                    resources:
+                      limits:
+                        cpu: "{{ .Values.sm_cpu }}"
+                        memory: "{{ .Values.sm_memory }}Mi"
+                      requests:
+                        cpu: "{{ .Values.sm_cpu }}"
+                        memory: "{{ .Values.sm_memory }}Mi"
   - targetRef:
       kind: Deployment
       apiVersion: apps/v1
@@ -94,7 +114,7 @@ spec:
                       requests:
                         cpu: "{{ .Values.te_cpu }}"
                         memory: "{{ .Values.te_memory }}Mi"
-  template: # trial
+  template: # Trial
     spec:
       setupTasks:
       - name: demo-ycsb
