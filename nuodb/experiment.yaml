@@ -1,7 +1,7 @@
 apiVersion: redskyops.dev/v1alpha1
 kind: Experiment
 metadata:
-  name: nuodb-example
+  name: nuodb-example-32
 spec:
   optimization:
   - name: "experimentBudget"
@@ -117,19 +117,24 @@ spec:
   setupServiceAccountName: nuodb-setup
   template: # Trial
     spec:
-      setupTasks:
-      - name: demo-ycsb
-        helmChart: demo-ycsb
-        helmChartVersion: 3.0.0
-        helmRepository: https://storage.cloud.google.com/nuodb-charts-incubator/
-        helmValues:
-        - name: cloud.provider
-          value: google
-        - name: cloud.zones
-          value: us-central1-a
-        - name: replicas
-          value: 1
-        - name: workload
-          value: b
-        - name: maxDelay
-          value: 240000
+      template: # Job
+        spec:
+          template: # Pod
+            spec:
+              container:
+                -name:
+          - name: demo-ycsb
+            helmChart: demo-ycsb
+            helmChartVersion: 3.0.0
+            helmRepository: https://storage.cloud.google.com/nuodb-charts-incubator/
+            helmValues:
+            - name: cloud.provider
+              value: google
+            - name: cloud.zones
+              value: us-central1-a
+            - name: replicas
+              value: 1
+            - name: workload
+              value: b
+            - name: maxDelay
+              value: 240000
