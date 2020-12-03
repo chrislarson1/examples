@@ -1,7 +1,7 @@
 apiVersion: redskyops.dev/v1alpha1
 kind: Experiment
 metadata:
-  name: nuodb-example-32
+  name: nuodb-example-34
 spec:
   optimization:
   - name: "experimentBudget"
@@ -121,20 +121,69 @@ spec:
         spec:
           template: # Pod
             spec:
-              container:
-                -name:
-          - name: demo-ycsb
-            helmChart: demo-ycsb
-            helmChartVersion: 3.0.0
-            helmRepository: https://storage.cloud.google.com/nuodb-charts-incubator/
-            helmValues:
-            - name: cloud.provider
-              value: google
-            - name: cloud.zones
-              value: us-central1-a
-            - name: replicas
-              value: 1
-            - name: workload
-              value: b
-            - name: maxDelay
-              value: 240000
+              restartPolicy: Never
+              containers:
+              - name: ycsb-load
+                image: docker.io/nuodb/ycsb:latest
+                imagePullPolicy: Always
+                env:
+                - name: DB_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: "demo.nuodb.com"
+                      key: database-name
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: "demo.nuodb.com"
+                      key: database-username
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: "demo.nuodb.com"
+                      key: database-password
+                - name: NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - { name: PEER_ADDRESS,        value: "nuodb.nuodb.svc" }
+                - { name: DB_SCHEMA,           value: "USER" }
+                - { name: YCSB_WORKLOAD,       value: "b" }
+                - { name: LB_POLICY,           value: "nearest" }
+                - { name: NO_OF_PROCESSES,     value: "2" }
+                - { name: NO_OF_ROWS,          value: "10000" }
+                - { name: NO_OF_ITERATIONS,    value: "0" }
+                - { name: OPS_PER_ITERATION,   value: "10000" }
+                - { name: MAX_DELAY,           value: "240000" }
+                - { name: TE_DIRECT,           value: "false" }
+                volumeMounts:
+                - name: ycsb-gen
+                  mountPath: /driver/ycsb_gen.sh
+                  subPath: ycsb_gen.sh
+                - name: startup
+                  mountPath: /driver/startup.sh
+                  subPath: startup.sh
+                - name: create
+                  mountPath: /driver/create_usertable.sh
+                  subPath: create_usertable.sh
+              volumes:
+              - name: ycsb-gen
+                configMap:
+                  name: demo-ycsb-2-nuodb-ycsb-gen
+                  defaultMode: 0777
+              - name: startup
+                configMap:
+                  name: demo-ycsb-2-nuodb-startup
+                  defaultMode: 0777
+              - name: create
+                configMap:
+                  name: demo-ycsb-2-nuodb-create
+                  defaultMode: 0777
