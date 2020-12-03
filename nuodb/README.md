@@ -16,11 +16,9 @@ You must have a Kubernetes cluster. We recommend using a cluster with 4 nodes, 4
    
 ## NuoDB Helm Chart Installation
 
-Before running the experiment, add the NuoDB helm repositories to your local helm client:
+Before running the experiment, add the NuoDB helm repository to your local helm client:
 
 `$ helm repo add nuodb https://storage.googleapis.com/nuodb-charts`
-
-`$ helm repo add nuodb-incubator https://nuodb-charts-incubator.storage.googleapis.com/`
 
 The NuoDB stack has four charts that need to be installed into your cluster. You can follow these
 [instructons](https://github.com/nuodb/nuodb-helm-charts/blob/master/stable/README.md), or simply run the following
@@ -45,7 +43,7 @@ The NuoDB database chart exposes a host of parameters that can be tuned
  `, `te_replicas`, where `sm` and `te` refer to the storage and transaction layers of the the NuoDB architecture
  , respectively.
 
-## Trial definition
+## Trial Job
 
 Now that we have our NuoDB components deployed in our cluster, we can proceed with running the experiment. The
  `experiment.yaml` file contains the full specification used by StormForge to optimize the appliction. Each trial

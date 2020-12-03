@@ -1,7 +1,7 @@
 apiVersion: redskyops.dev/v1alpha1
 kind: Experiment
 metadata:
-  name: nuodb-example-34
+  name: nuodb-example
 spec:
   optimization:
   - name: "experimentBudget"
@@ -53,7 +53,7 @@ spec:
 #      name: sm-database-nuodb-cluster0-demo
 #    patch: |
 #      spec:
-#        replicas: "{{ .Values.sm_replicas }}"
+#        replicas: {{ .Values.sm_replicas }}
 #        template:
 #          spec:
 #            containers:
@@ -76,7 +76,7 @@ spec:
       name: sm-database-nuodb-cluster0-demo-hotcopy
     patch: |
       spec:
-        replicas: "{{ .Values.sm_replicas }}"
+        replicas: {{ .Values.sm_replicas }}
         template:
           spec:
             containers:
@@ -99,7 +99,7 @@ spec:
       name: te-database-nuodb-cluster0-demo
     patch: |
       spec:
-        replicas: "{{ .Values.te_replicas }}"
+        replicas: {{ .Values.te_replicas }}
         template:
           spec:
             containers:
