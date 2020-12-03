@@ -20,6 +20,10 @@ Before running the experiment, add the NuoDB helm repository to your local helm 
 
 `$ helm repo add nuodb https://storage.googleapis.com/nuodb-charts`
 
+Next, create a dedicated namespace for our experiment:
+
+`$ kubectl create namespace nuodb && kubectl config set-context --current --namespace=nuodb`
+
 The NuoDB stack has four charts that need to be installed into your cluster. You can follow these
 [instructons](https://github.com/nuodb/nuodb-helm-charts/blob/master/stable/README.md), or simply run the following
   commands to install the core NuoDB components into your cluster:

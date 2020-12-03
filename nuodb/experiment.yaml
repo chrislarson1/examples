@@ -10,26 +10,26 @@ spec:
     value: "10"
   parameters:
   - name: persistence_size
-    min: 5
-    max: 30
+    min: 100
+    max: 1000
   - name: sm_memory
-    min: 8
-    max: 16
+    min: 1000
+    max: 2000
   - name: sm_cpu
-    min: 4
-    max: 8
+    min: 500
+    max: 1000
   - name: sm_replicas
     min: 1
-    max: 3
+    max: 2
   - name: te_memory
-    min: 8
-    max: 16
+    min: 1000
+    max: 2000
   - name: te_cpu
-    min: 2
-    max: 4
+    min: 500
+    max: 1000
   - name: te_replicas
     min: 1
-    max: 3
+    max: 2
   metrics:
   - name: duration
     minimize: true
@@ -47,34 +47,11 @@ spec:
           - sm
           - te
   patches:
-#  - targetRef:
-#      kind: StatefulSet
-#      apiVersion: apps/v1
-#      name: sm-database-nuodb-cluster0-demo
-#    patch: |
-#      spec:
-#        replicas: {{ .Values.sm_replicas }}
-#        template:
-#          spec:
-#            containers:
-#            - name: engine
-#              resources:
-#                database:
-#                  persistence:
-#                    size: "{{ .Values.persistence_size }}Gi"
-#                  sm:
-#                    resources:
-#                      limits:
-#                        cpu: "{{ .Values.sm_cpu }}"
-#                        memory: "{{ .Values.sm_memory }}Mi"
-#                      requests:
-#                        cpu: "{{ .Values.sm_cpu }}"
-#                        memory: "{{ .Values.sm_memory }}Mi"
   - targetRef:
       kind: StatefulSet
       apiVersion: apps/v1
-      name: sm-database-nuodb-cluster0-demo-hotcopy
-    patch: |
+      name: sm-database-nuodb-cluster0-demo
+    patch: &sm-patch |
       spec:
         replicas: {{ .Values.sm_replicas }}
         template:
@@ -84,15 +61,20 @@ spec:
               resources:
                 database:
                   persistence:
-                    size: "{{ .Values.persistence_size }}Gi"
+                    size: "{{ .Values.persistence_size }}Mi"
                   sm:
                     resources:
                       limits:
-                        cpu: "{{ .Values.sm_cpu }}"
+                        cpu: "{{ .Values.sm_cpu }}m"
                         memory: "{{ .Values.sm_memory }}Mi"
                       requests:
-                        cpu: "{{ .Values.sm_cpu }}"
+                        cpu: "{{ .Values.sm_cpu }}m"
                         memory: "{{ .Values.sm_memory }}Mi"
+  - targetRef:
+      kind: StatefulSet
+      apiVersion: apps/v1
+      name: sm-database-nuodb-cluster0-demo-hotcopy
+    patch: *sm-patch
   - targetRef:
       kind: Deployment
       apiVersion: apps/v1
@@ -109,10 +91,10 @@ spec:
                   te:
                     resources:
                       limits:
-                        cpu: "{{ .Values.te_cpu }}"
+                        cpu: "{{ .Values.te_cpu }}m"
                         memory: "{{ .Values.te_memory }}Mi"
                       requests:
-                        cpu: "{{ .Values.te_cpu }}"
+                        cpu: "{{ .Values.te_cpu }}m"
                         memory: "{{ .Values.te_memory }}Mi"
   setupServiceAccountName: nuodb-setup
   template: # Trial
@@ -121,7 +103,7 @@ spec:
         spec:
           template: # Pod
             spec:
-              restartPolicy: Never
+              restartPolicy: OnFailure
               containers:
               - name: ycsb-load
                 image: docker.io/nuodb/ycsb:latest
@@ -158,9 +140,9 @@ spec:
                 - { name: DB_SCHEMA,           value: "USER" }
                 - { name: YCSB_WORKLOAD,       value: "b" }
                 - { name: LB_POLICY,           value: "nearest" }
-                - { name: NO_OF_PROCESSES,     value: "2" }
+                - { name: NO_OF_PROCESSES,     value: "10" }
                 - { name: NO_OF_ROWS,          value: "10000" }
-                - { name: NO_OF_ITERATIONS,    value: "0" }
+                - { name: NO_OF_ITERATIONS,    value: "10" }
                 - { name: OPS_PER_ITERATION,   value: "10000" }
                 - { name: MAX_DELAY,           value: "240000" }
                 - { name: TE_DIRECT,           value: "false" }

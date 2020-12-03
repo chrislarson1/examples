@@ -17,8 +17,7 @@ data:
     db_schema=$2
     count=$3
     letter=$4
-    #repcount=$5
-    repcount=1
+    repcount=$5
     threads=$6
 
     #export YCSB_HOME=/driver
@@ -187,14 +186,9 @@ data:
     # fi
 
     # set default values
-    #: ${NO_OF_PROCESSES:=10}
-    #: ${NO_OF_ROWS:=10000}
-    #: ${NO_OF_ITERATIONS:=10000}
-    #: ${OPS_PER_ITERATION:=10000}
-
-    : ${NO_OF_PROCESSES:=1}
+    : ${NO_OF_PROCESSES:=10}
     : ${NO_OF_ROWS:=10000}
-    : ${NO_OF_ITERATIONS:=1}
+    : ${NO_OF_ITERATIONS:=10}
     : ${OPS_PER_ITERATION:=10000}
     : ${YCSB_WORKLOAD:=b}
 
@@ -212,18 +206,12 @@ data:
         /driver/ycsb_gen.sh load user1 ${NO_OF_ROWS}
     fi
 
-    #for i in $(seq 1 $NO_OF_PROCESSES);
-    #do
-    #    /driver/ycsb_gen.sh run user1 ${OPS_PER_ITERATION} ${YCSB_WORKLOAD} ${NO_OF_ITERATIONS} 2 &
-    #done
+    for i in $(seq 1 $NO_OF_PROCESSES);
+    do
+        /driver/ycsb_gen.sh run user1 ${OPS_PER_ITERATION} ${YCSB_WORKLOAD} ${NO_OF_ITERATIONS} 2 &
+    done
+    wait
 
-    /driver/ycsb_gen.sh run user1 ${OPS_PER_ITERATION} ${YCSB_WORKLOAD} ${NO_OF_ITERATIONS} 2
-
-    #/driver/ycsb_gen.sh run user1 ${NUMOFROWS} ${YCSB_WORKLOAD} ${NUMOFITERATIONS} ${YCSB_THREADS} &
-
-    #while [ true ]; do
-    #    sleep 1200
-    #done
     exit 0
 ---
 # Source: demo-ycsb/templates/configmap.yaml
