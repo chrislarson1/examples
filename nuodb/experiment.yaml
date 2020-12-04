@@ -7,26 +7,26 @@ spec:
   - name: "experimentBudget"
     value: "200"
   - name: "burnIn"
-    value: "10"
+    value: "5"
   parameters:
-  - name: persistence_size
-    min: 100
-    max: 1000
+  - name: sm_persistence_size
+    min: 5
+    max: 20
   - name: sm_memory
     min: 1000
-    max: 2000
+    max: 4000
   - name: sm_cpu
     min: 500
-    max: 1000
+    max: 2000
   - name: sm_replicas
     min: 1
     max: 2
   - name: te_memory
     min: 1000
-    max: 2000
+    max: 4000
   - name: te_cpu
     min: 500
-    max: 1000
+    max: 2000
   - name: te_replicas
     min: 1
     max: 2
@@ -53,16 +53,17 @@ spec:
       name: sm-database-nuodb-cluster0-demo
     patch: &sm-patch |
       spec:
-        replicas: {{ .Values.sm_replicas }}
         template:
           spec:
             containers:
             - name: engine
               resources:
                 database:
-                  persistence:
-                    size: "{{ .Values.persistence_size }}Mi"
                   sm:
+                    hotCopy:
+                      replicas: {{ .Values.sm_replicas }}
+                      persistence:
+                        size: "{{ .Values.sm_persistence_size }}Gi"
                     resources:
                       limits:
                         cpu: "{{ .Values.sm_cpu }}m"
@@ -81,7 +82,6 @@ spec:
       name: te-database-nuodb-cluster0-demo
     patch: |
       spec:
-        replicas: {{ .Values.te_replicas }}
         template:
           spec:
             containers:
@@ -89,6 +89,7 @@ spec:
               resources:
                 database:
                   te:
+                    replicas: {{ .Values.te_replicas }}
                     resources:
                       limits:
                         cpu: "{{ .Values.te_cpu }}m"
@@ -103,7 +104,7 @@ spec:
         spec:
           template: # Pod
             spec:
-              restartPolicy: OnFailure
+              restartPolicy: Never
               containers:
               - name: ycsb-load
                 image: docker.io/nuodb/ycsb:latest
@@ -142,7 +143,7 @@ spec:
                 - { name: LB_POLICY,           value: "nearest" }
                 - { name: NO_OF_PROCESSES,     value: "10" }
                 - { name: NO_OF_ROWS,          value: "10000" }
-                - { name: NO_OF_ITERATIONS,    value: "10" }
+                - { name: NO_OF_ITERATIONS,    value: "25" }
                 - { name: OPS_PER_ITERATION,   value: "10000" }
                 - { name: MAX_DELAY,           value: "240000" }
                 - { name: TE_DIRECT,           value: "false" }
