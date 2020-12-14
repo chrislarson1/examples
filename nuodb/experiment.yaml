@@ -1,7 +1,7 @@
 apiVersion: redskyops.dev/v1alpha1
 kind: Experiment
 metadata:
-  name: nuodb-example
+  name: nuodb-example-45
 spec:
   optimization:
   - name: "experimentBudget"
@@ -40,12 +40,8 @@ spec:
     # Note that these cost weights are specific to GKE and represent $22/month/cpu and $3/month/GB
     query: '{{resourceRequests .Pods "cpu=0.022,memory=0.000000000003"}}'
     selector:
-      matchExpressions:
-        - key: component
-          operator: In
-          values:
-          - sm
-          - te
+      matchLabels:
+        app: database-nuodb-cluster0-demo
   patches:
   - targetRef:
       kind: StatefulSet
