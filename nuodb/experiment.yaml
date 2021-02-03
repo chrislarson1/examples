@@ -1,7 +1,7 @@
 apiVersion: redskyops.dev/v1alpha1
 kind: Experiment
 metadata:
-  name: nuodb-example-45
+  name: nuodb-example
 spec:
   optimization:
   - name: "experimentBudget"
@@ -9,27 +9,24 @@ spec:
   - name: "burnIn"
     value: "5"
   parameters:
-  - name: sm_persistence_size
-    min: 5
-    max: 20
   - name: sm_memory
-    min: 1000
-    max: 4000
+    min: 4000
+    max: 10000
   - name: sm_cpu
-    min: 500
-    max: 2000
-  - name: sm_replicas
-    min: 1
-    max: 2
+    min: 4000
+    max: 8000
+  # - name: sm_replicas
+  #   min: 1
+  #   max: 2
   - name: te_memory
-    min: 1000
-    max: 4000
+    min: 4000
+    max: 8000
   - name: te_cpu
-    min: 500
-    max: 2000
-  - name: te_replicas
-    min: 1
-    max: 2
+    min: 2000
+    max: 4000
+  # - name: te_replicas
+  #   min: 1
+  #   max: 2
   metrics:
   - name: duration
     minimize: true
@@ -49,24 +46,18 @@ spec:
       name: sm-database-nuodb-cluster0-demo
     patch: &sm-patch |
       spec:
+        # replicas: {{ .Values.sm_replicas }}
         template:
           spec:
             containers:
             - name: engine
               resources:
-                database:
-                  sm:
-                    hotCopy:
-                      replicas: {{ .Values.sm_replicas }}
-                      persistence:
-                        size: "{{ .Values.sm_persistence_size }}Gi"
-                    resources:
-                      limits:
-                        cpu: "{{ .Values.sm_cpu }}m"
-                        memory: "{{ .Values.sm_memory }}Mi"
-                      requests:
-                        cpu: "{{ .Values.sm_cpu }}m"
-                        memory: "{{ .Values.sm_memory }}Mi"
+                limits:
+                  cpu: "{{ .Values.sm_cpu }}m"
+                  memory: "{{ .Values.sm_memory }}Mi"
+                requests:
+                  cpu: "{{ .Values.sm_cpu }}m"
+                  memory: "{{ .Values.sm_memory }}Mi"
   - targetRef:
       kind: StatefulSet
       apiVersion: apps/v1
@@ -78,21 +69,18 @@ spec:
       name: te-database-nuodb-cluster0-demo
     patch: |
       spec:
+        # replicas: {{ .Values.te_replicas }}
         template:
           spec:
             containers:
             - name: engine
               resources:
-                database:
-                  te:
-                    replicas: {{ .Values.te_replicas }}
-                    resources:
-                      limits:
-                        cpu: "{{ .Values.te_cpu }}m"
-                        memory: "{{ .Values.te_memory }}Mi"
-                      requests:
-                        cpu: "{{ .Values.te_cpu }}m"
-                        memory: "{{ .Values.te_memory }}Mi"
+                limits:
+                  cpu: "{{ .Values.te_cpu }}m"
+                  memory: "{{ .Values.te_memory }}Mi"
+                requests:
+                  cpu: "{{ .Values.te_cpu }}m"
+                  memory: "{{ .Values.te_memory }}Mi"
   setupServiceAccountName: nuodb-setup
   template: # Trial
     spec:
