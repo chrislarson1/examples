@@ -29,7 +29,7 @@ The NuoDB stack has four charts that need to be installed into your cluster. You
 
 Our goal is to configure the NuoDB resources to achieve the optimal combination of cost and performance. In this experiment we will measure performance using the `duration` template function, which computes the difference between the `.CompletionTime` and `.StartTime` of the Trial job. For our cost metric, we define a template function that maps resource usage of the NuoDB database pods to a monthly US dollar amount. Documentation on StormForge Optimize metrics can be found [here](https://docs.stormforge.io/metrics/).
 
-The NuoDB database chart exposes a host of parameters that can be tuned ([chart documentation](https://github.com/nuodb/nuodb-helm-charts/blob/master/stable/database/README.md)); in this example we are going to tune: `persistence_size`, `sm_cpu`, `sm_memory`, `sm_replicas`, `te_cpu`, `te_memory`, `te_replicas`, where `sm` and `te` refer to the storage and transaction layers of the the NuoDB architecture, respectively.
+The NuoDB database chart exposes a host of parameters that can be tuned ([chart documentation](https://github.com/nuodb/nuodb-helm-charts/blob/master/stable/database/README.md)); in this example we are going to tune: `sm_cpu`, `sm_memory`, `te_cpu`, `te_memory`, and `te_replicas`, where `sm` and `te` refer to the storage-manager and transaction-engine components of the the NuoDB stack, respectively. We've set the parameter baselines equal to the default limits defined in the helm chart.
 
 ## Trial Job
 

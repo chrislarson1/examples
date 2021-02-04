@@ -10,23 +10,27 @@ spec:
     value: "5"
   parameters:
   - name: sm_memory
-    min: 4000
-    max: 10000
-  - name: sm_cpu
-    min: 4000
-    max: 8000
-  # - name: sm_replicas
-  #   min: 1
-  #   max: 2
-  - name: te_memory
-    min: 4000
-    max: 8000
-  - name: te_cpu
     min: 2000
+    max: 8000
+    baseline: 8000
+  - name: sm_cpu
+    min: 2000
+    max: 8000
+    baseline: 4000
+  - name: te_memory
+    min: 2000
+    max: 8000
+    baseline: 8000
+  - name: te_cpu
+    min: 1000
     max: 4000
-  # - name: te_replicas
-  #   min: 1
-  #   max: 2
+    baseline: 2000
+  - name: te_replicas
+    values:
+    - "1"
+    - "2"
+    - "3"
+    baseline: "1"
   metrics:
   - name: duration
     minimize: true
@@ -43,10 +47,9 @@ spec:
   - targetRef:
       kind: StatefulSet
       apiVersion: apps/v1
-      name: sm-database-nuodb-cluster0-demo
-    patch: &sm-patch |
+      name: sm-database-nuodb-cluster0-demo-hotcopy
+    patch: |
       spec:
-        # replicas: {{ .Values.sm_replicas }}
         template:
           spec:
             containers:
@@ -59,17 +62,12 @@ spec:
                   cpu: "{{ .Values.sm_cpu }}m"
                   memory: "{{ .Values.sm_memory }}Mi"
   - targetRef:
-      kind: StatefulSet
-      apiVersion: apps/v1
-      name: sm-database-nuodb-cluster0-demo-hotcopy
-    patch: *sm-patch
-  - targetRef:
       kind: Deployment
       apiVersion: apps/v1
       name: te-database-nuodb-cluster0-demo
     patch: |
       spec:
-        # replicas: {{ .Values.te_replicas }}
+        replicas: {{ .Values.te_replicas }}
         template:
           spec:
             containers:
