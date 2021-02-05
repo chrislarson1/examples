@@ -1,7 +1,7 @@
 apiVersion: redskyops.dev/v1alpha1
 kind: Experiment
 metadata:
-  name: nuodb-example
+  name: nuodb-demo-2
 spec:
   optimization:
   - name: "experimentBudget"
@@ -10,11 +10,11 @@ spec:
     value: "5"
   parameters:
   - name: sm_memory
-    min: 2000
+    min: 100
     max: 8000
     baseline: 8000
   - name: sm_cpu
-    min: 2000
+    min: 100
     max: 8000
     baseline: 4000
   - name: te_memory
@@ -22,14 +22,13 @@ spec:
     max: 8000
     baseline: 8000
   - name: te_cpu
-    min: 1000
+    min: 500
     max: 4000
     baseline: 2000
   - name: te_replicas
     values:
     - "1"
     - "2"
-    - "3"
     baseline: "1"
   metrics:
   - name: duration

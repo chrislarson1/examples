@@ -33,6 +33,6 @@ The NuoDB database chart exposes a host of parameters that can be tuned ([chart 
 
 ## Trial Job
 
-Now that we have our NuoDB components deployed in our cluster, we can proceed with running the experiment. The `experiment.yaml` file contains the full specification used by StormForge to optimize the appliction. Each trial consists of a few steps. First, the resources are patched with the updated trial parameter assignments. Once those resources pass readiness checks, we use the Yahoo! Cloud Serving Benchmark (YCSB) tool suite to apply an SQL workload against the database consisting of a 95/5% read/write split.
+Now that we have our NuoDB components deployed in our cluster, we can proceed with running the experiment. The `experiment.yaml` file contains the full specification used by StormForge to optimize the appliction. Each trial consists of a few steps. First, the resources are patched with the updated trial parameter assignments. Once those resources pass readiness checks, we use the Yahoo! Cloud Serving Benchmark (YCSB) tool suite to apply an SQL workload against the database consisting of a 95/5% read/write split. Details of the load test can be found in the `configmap.yaml` file.
 
 For more information on running, monitoring and maintaining experiments, please refer to our [quickstart](https://docs.stormforge.io/getting-started/quickstart/) and [experiment lifecycle](https://docs.stormforge.io/lifecycle/) documentation.
